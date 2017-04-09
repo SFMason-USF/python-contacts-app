@@ -1,29 +1,6 @@
 import sqlite3
 import os
 
-#TODO: remove this before integrating with AddressBook.py
-class Contact:
-    def __init__(self, first_name, last_name, phone, email, home):
-        self.name = (first_name or '') + ' ' + (last_name or '')
-        self.phone = phone
-        self.email = email
-        self.home = home
-        
-    def __str__(self):
-        return("Name: {0}\n Phone Number: {1}\n E-mail Address: {2}\n Home Address {3} ").format(self.name, self.phone, self.email, self.home)
-
-    def edit_name(self, first_name, last_name):
-        self.name = first_name + last_name
-
-    def edit_email(self, email):
-        self.email = email
-
-    def edit_phone(self, phone):
-        self.phone = phone
-
-    def edit_home(self, home):
-        self.home = home
-
 class DatabaseInterface:
     '''Interface between the program functionality and the database storage of data.'''
     #Names of database columns
