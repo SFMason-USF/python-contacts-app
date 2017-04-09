@@ -4,15 +4,15 @@ import os
 #TODO: add ability to create database for a user on registration, then raise
 #exception if invalid username (i.e.  OS can't name a file after the username)
 class DatabaseInterface:
-    '''Interface between the program functionality and the database storage of data.
-    Allows connections to multiple databases from one instance, but it is intended to 
-    maintin 1 database connection '''
+    '''Interface between the program functionality and the database storage of data.'''
 
+    #The name of the table holding contacts
     TABLE_NAME = 'Contacts'
 
     def __init__(self, username):
         self.__currentUser = str(username)
         self.__dbConnection = None
+        self.__dbCursor = None
 
     def __enter__(self):
         self.Connect()
@@ -25,17 +25,23 @@ class DatabaseInterface:
     def CurrentUser(self):
         return self.__currentUser
 
-    @CurrentUser.setter
-    def CurrentUser(self, newUser):
-        #TODO: Later if validation is necessary, validate
-        self.__currentUser = str(newUser)
+    @property
+    def Contacts(self):
+        return [x for x in self.__dbCursor.execute('select * from ' + DatabaseInterface.TABLE_NAME)]
 
     def Connect(self):
         '''Connect to the database for the current user'''
         path = os.path.join(os.getcwd(), 'data')
         os.makedirs(path, exist_ok=True)
         self.__dbConnection = sqlite3.connect(os.path.join(path, self.__currentUser + '.db'))
-        self.__dbConnection.execute('''SELECT ? FROM sqlite_master WHERE tpe='table' AND name=?''', ())
+        self.__dbCursor = self.__dbConnection.cursor()
+        self.__dbCursor.execute('''create table if not exists %s (
+        FirstName text, 
+        LastName text, 
+        Phone int, 
+        Email text, 
+        Address text
+        )''' % DatabaseInterface.TABLE_NAME)
 
     def Commit(self):
         '''Commit changes to the database.
@@ -62,10 +68,10 @@ class DatabaseInterface:
 if __name__ == '__main__':
     #Example 1: With with statement
     with DatabaseInterface('mason11') as db:
-        print(db.CurrentUser)
+        print(db.Contacts)
 
     #Example 2: The dirty way
-    db = DatabaseInterface('mason11')
-    db.Connect()
-    print(db.CurrentUser)
-    db.CloseOut()
+    #db = DatabaseInterface('mason11')
+    #db.Connect()
+    #print(db.CurrentUser)
+    #db.CloseOut()
