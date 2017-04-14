@@ -1,72 +1,130 @@
+# python ./AddressBook.py
+
 import os
 
 class Contact:
-    def __init__(self, first_name, last_name, phone, email, home):
-        self.name = first_name + last_name
-        self.phone = phone
-        self.email = email
-        self.home = home
-        
+    errorMessages = []
+    def __init__(self, first_name = "", last_name = "", phone = "" , email = "", street_address = "", home_city = "", home_state = "", home_zip = ""):
+        self.name = first_name + " " +  last_name
+
+        if len(str(phone)) == 10 or len(str(phone)) == 11:
+            errorMessages.append("phone number must be 10 numbers (including area code)")
+        else:
+            self.phone = phone
+
+        if '@' in email:
+            errorMessages.append("e-mail must contain a domain")
+        else:
+            self.email = email
+
+        if len(str(home_zip)) == 5:
+            errorMessages.append("zip code must be 5 numbers")
+        else:
+            self.home = street_address + "\n" + home_city + ", " + home_state + " " + str(home_zip)
+
     def __str__(self):
-        return("Name: {0}\n Phone Number: {1}\n E-mail Address: {2}\n Home Address {3} ").format(self.name, self.phone, self.email, self.home)
+        return("Name: {0}\nPhone Number: {1}\nE-mail Address: {2}\nHome Address: {3} ").format(self.name, self.phone, self.email, self.home)
 
-    def edit_name(self, first_name, last_name):
-        self.name = first_name + last_name
+    def name(self, first_name, last_name):
+        self.name = first_name + " " + last_name
 
-    def edit_email(self, email):
-        self.email = email
+    def email(self, email):
+        if '@' in email:
+            errorMessages.append("e-mail must contain a domain")
+        else:
+            self.email = email
 
-    def edit_phone(self, phone):
-        self.phone = phone
+    def phone(self, phone):
+        if len(str(phone)) == 10 or len(str(phone)) == 11:
+            errorMessages.append("phone number must be 10 numbers (including area code)")
+        else:
+            self.phone = phone
 
-    def edit_home(self, home):
-        self.home = home
+    def home(self, street_address = "", home_city = "", home_state = "", home_zip = ""):
+        if len(str(home_zip)) == 5:
+            errorMessages.append("zip code must be 5 numbers")
+        else:
+            self.home = street_address + "\n" + home_city + ", " + home_state + " " + str(home_zip)
+
+contacts_list = []
 
 def retrieveContactInfo():
     try:
-        contact_first_name = input("First Name: ")
-        contact_last_name = input("Last Name: ")
-        contact_phone = input("Phone Number: ")
-        contact_email = input("E-mail Address: ")
+        contact_first_name = str(input("First Name: "))
+        contact_last_name = str(input("Last Name: "))
+        contact_phone = int(input("Phone Number: "))
+        contact_email = str(input("E-mail Address: "))
+        contact_street = str(input("Enter street address: "))
+        contact_city = str(input("Enter city: "))
+        contact_state = str(input("Enter state: "))
+        contact_zip = int(input("Enter zip code: "))
+
+        contact = Contact(contact_first_name, contact_last_name, contact_phone, contact_email,contact_street, contact_city, contact_state, contact_zip)
+        
+        if len(contact.errorMessages) > 0:
+            print(contact.errorMessages)
+        
         return contact
-    except SyntaxError:
-        print("Missing input")
-    #incomplete on exceptions
+    except ValueError:
+        print("Not a valid entry")
 
 def addContact():
-    contacts_list = []
-
     try:
         contact = retrieveContactInfo()
-        #contacts_list.append(contact)
-    #incomplete
-    except SyntaxError:
-        print("Random Error is used")
+        contacts_list.append(contact)
+    except ValueError:
+        print("Error in the entry")
+
 
 def displayContacts():
-    for contact in contacts_list:
-        print(contact.first_name, contact.last_name)
+    if len(contacts_list) == 0:
+        for contact in contacts_list:
+            print(contact.name)
+    else:
+        "No Contacts"
 
 def searchContact():
-    search_contact = input("Contact: ")
-    search_contact = search_contact.lower()
-    is_found = False
+    found_contacts_list = []
+    search_contact = input("Search by Name or Number: ")
+    search_contact_input = search_contact.lower()
 
     for contact in contacts_list:
         contact_name = contact.name
         contact_name = contact_name.lower()
 
-        if contact_name == search_contact_name:
-            is_found = True
-            break
+        if search_contact_input in contact_name or contact.phone == search_contact_input:
+            found_contacts_list.append(contact)
 
-    if not is_found:
+    if found_contacts_list == []:
         print("No Results Found")
     else:
-        showContact(contact_name)
+        showContactInfo(contact)
 
-def showContact(contact):
-    str(contact)
+def showContactInfo(contact):
+    #incomplete until GUI
+    # Just return values into corresponding fields
+    print(contact)
+    #str(contact)
 
-def deleteContact(contact):
-    del contact
+def deleteContact():
+    try:
+        if contacts_list == []:
+            print("No Contacts")
+        else:
+            nameToDelete = input("Enter the name to delete:" )
+
+            for i in range(0, len(contacts_list)):
+                currContact = contacts_list[i].name
+                if nameToDelete in currContact:
+                    print("deleting {0} ...".format(currContact))
+                    del contacts_list[i]
+    except IndexError:
+        print("Out of range")
+
+if __name__ == "__main__":
+    
+    addContact()
+    displayContacts()
+    searchContact()
+    deleteContact()
+    displayContacts()
