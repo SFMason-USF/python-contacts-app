@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-class LoginP:
+class LoginP():
     def __init__(self, master):
         self.master = master
         self.frame = tk.Frame(self.master)
@@ -9,31 +9,48 @@ class LoginP:
         master.geometry("950x550+500+150")
         master.resizable(width=False, height=False)
 
-        self.LoginID = tk.Text(height=1, width=25).place(x=325, y=155)
-        self.IDlbl = tk.Label(text="Login ID").place(x=325, y=175)
+        self.LoginID = tk.Entry(master, width=25)
+        self.LoginID.insert(0, 'Login ID')
+        self.LoginID.place(x=325, y=155)
+        self.IDlbl = tk.Label(text="Login ID")
+        self.IDlbl.place(x=325, y=175)
 
-        self.LoginPASS = tk.Text(height=1, width=25).place(x=325, y=255)
-        self.PASSlbl = tk.Label(text="Password").place(x=325, y=275)
+        self.LoginPASS = tk.Entry(width=25)
+        self.LoginPASS.insert(0, 'Password')
+        self.LoginPASS.place(x=325, y=255)
+        self.PASSlbl = tk.Label(text="Password")
+        self.PASSlbl.place(x=325, y=275)
 
         self.insideFrame.place(x=325, y=325)
-        self.button1 = tk.Button(self.insideFrame, text='login', width=28, command=self.load_window)
+
+        def b1callback():
+          self.load_window()
+          #christian'sFunction(self.myEntry.get())
+        self.button1 = tk.Button(self.insideFrame, text='login', width=28, command=b1callback)
         self.button1.pack()
 
         self.button2 = tk.Button(self.insideFrame, text='New User Registration', width=28, command=self.new_window)
         self.button2.pack()
 
-    def _close(self):
-        self.destroy()
+    def __close(self):
+        print(self.LoginID)
+        print(self.IDlbl)
+        self.LoginID.destroy()
+        self.IDlbl.destroy()
+        self.LoginPASS.destroy()
+        self.PASSlbl.destroy()
+        self.button1.destroy()
+        self.button2.destroy()
+        #self.LoginID.destroy()
 
     def new_window(self):
         self.newWindow = tk.Toplevel(self.master)
         self.app = RegisterP(self.newWindow)
 
     def load_window(self):
-
         self.newWindow = self.master
         self.app = MainP(self.newWindow)
-        self._close()
+        self.__close()
 
 
 class RegisterP:
@@ -53,8 +70,8 @@ class RegisterP:
         self.Phone = tk.Text(height=1, width=25).place(x=325, y=195)
         self.Phonelbl = tk.Label(text="Phone Number").place(x=325, y=215)
 
-        self.Email = tk.Text(height=1, width=25).place(x=375, y=235)
-        self.Emaillbl = tk.Label(text="Email").place(x=375, y=255)
+        self.Email = tk.Text(height=1, width=25).place(x=325, y=235)
+        self.Emaillbl = tk.Label(text="Email").place(x=325, y=255)
 
         self.Street = tk.Text(height=1, width=25).place(x=325, y=275)
         self.Streetlbl = tk.Label(text="Address").place(x=325, y=295)
@@ -75,21 +92,47 @@ class MainP:
     def __init__(self, master):
         self.master = master
         self.frame = tk.Frame(self.master)
-        #self.insideFrame = tk.Frame(width=200, height=100)
+        self.insideFrame = tk.Frame(width=200, height=100)
         master.geometry("950x550+500+150")
         master.resizable(width=False, height=False)
+
+
+        self.AddressL = tk.Listbox()
+        self.AddressL.place(x=0, y=0)
+        self.AddressL.config(width=45, height=34)
+
+        self.insideFrame.place(x=275, y=485)
+
+        self.Newbtn = tk.Button(self.insideFrame, text='New', width=18)
+        self.Newbtn.pack(side=tk.LEFT)
+
+        self.Editbtn = tk.Button(self.insideFrame, text='Edit', width=18)
+        self.Editbtn.pack(side=tk.LEFT)
+
+        self.Savebtn = tk.Button(self.insideFrame, text='Save', width=18)
+        self.Savebtn.pack(side=tk.LEFT)
+
+        self.Deletebtn = tk.Button(self.insideFrame, text='Delete', width=18)
+        self.Deletebtn.pack(side=tk.LEFT)
+
+        self.Cancelbtn = tk.Button(self.insideFrame, text='Cancel', width=18)
+        self.Cancelbtn.pack(side=tk.LEFT)
+
 
         self.Fname = tk.Text(height=1, width=25).place(x=325, y=155)
         self.Fnamelbl = tk.Label(text="First Name").place(x=325, y=175)
 
-        self.Lname = tk.Text(height=1, width=25).place(x=375, y=155)
-        self.Lnamelbl = tk.Label(text="Last Name").place(x=375, y=175)
+        self.Fname = tk.Text(height=1, width=25).place(x=325, y=155)
+        self.Fnamelbl = tk.Label(text="First Name").place(x=325, y=175)
+
+        self.Lname = tk.Text(height=1, width=25).place(x=575, y=155)
+        self.Lnamelbl = tk.Label(text="Last Name").place(x=575, y=175)
 
         self.Phone = tk.Text(height=1, width=25).place(x=325, y=195)
         self.Phonelbl = tk.Label(text="Phone Number").place(x=325, y=215)
 
-        self.Email = tk.Text(height=1, width=25).place(x=375, y=235)
-        self.Emaillbl = tk.Label(text="Email").place(x=375, y=255)
+        self.Email = tk.Text(height=1, width=25).place(x=325, y=235)
+        self.Emaillbl = tk.Label(text="Email").place(x=325, y=255)
 
         self.Street = tk.Text(height=1, width=25).place(x=325, y=275)
         self.Streetlbl = tk.Label(text="Address").place(x=325, y=295)
