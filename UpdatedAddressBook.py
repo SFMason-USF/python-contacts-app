@@ -3,18 +3,24 @@
 import os
 
 class Contact:
-    
+    errorMessages = []
     def __init__(self, first_name = "", last_name = "", phone = "" , email = "", street_address = "", home_city = "", home_state = "", home_zip = ""):
         self.name = first_name + " " +  last_name
 
-        assert len(str(phone)) == 10 or len(str(phone)) == 11, "phone number must be 10 numbers (including area code)"
-        self.phone = phone
+        if len(str(phone)) == 10 or len(str(phone)) == 11:
+            errorMessages.append("phone number must be 10 numbers (including area code)")
+        else:
+            self.phone = phone
 
-        assert '@' in email, "e-mail must contain a domain"
-        self.email = email
+        if '@' in email:
+            errorMessages.append("e-mail must contain a domain")
+        else:
+            self.email = email
 
-        assert len(str(home_zip)) == 5, "zip code must be 5 numbers"
-        self.home = street_address + "\n" + home_city + ", " + home_state + " " + str(home_zip)
+        if len(str(home_zip)) == 5:
+            errorMessages.append("zip code must be 5 numbers")
+        else:
+            self.home = street_address + "\n" + home_city + ", " + home_state + " " + str(home_zip)
 
     def __str__(self):
         return("Name: {0}\nPhone Number: {1}\nE-mail Address: {2}\nHome Address: {3} ").format(self.name, self.phone, self.email, self.home)
@@ -23,16 +29,22 @@ class Contact:
         self.name = first_name + " " + last_name
 
     def email(self, email):
-        assert '@' in email, "e-mail must contain a domain"
-        self.email = email
+        if '@' in email:
+            errorMessages.append("e-mail must contain a domain")
+        else:
+            self.email = email
 
     def phone(self, phone):
-        assert len(str(phone)) == 10 or len(str(phone)) == 11, "phone number must be 10 numbers (including area code)"
-        self.phone = phone
+        if len(str(phone)) == 10 or len(str(phone)) == 11:
+            errorMessages.append("phone number must be 10 numbers (including area code)")
+        else:
+            self.phone = phone
 
     def home(self, street_address = "", home_city = "", home_state = "", home_zip = ""):
-        assert len(str(home_zip)) == 5, "zip code must be 5 numbers"
-        self.home = street_address + " " + home_city + ", " + home_state + " " + home_zip
+        if len(str(home_zip)) == 5:
+            errorMessages.append("zip code must be 5 numbers")
+        else:
+            self.home = street_address + "\n" + home_city + ", " + home_state + " " + str(home_zip)
 
 contacts_list = []
 
@@ -48,6 +60,10 @@ def retrieveContactInfo():
         contact_zip = int(input("Enter zip code: "))
 
         contact = Contact(contact_first_name, contact_last_name, contact_phone, contact_email,contact_street, contact_city, contact_state, contact_zip)
+        
+        if len(contact.errorMessages) > 0:
+            print(contact.errorMessages)
+        
         return contact
     except ValueError:
         print("Not a valid entry")
@@ -56,7 +72,6 @@ def addContact():
     try:
         contact = retrieveContactInfo()
         contacts_list.append(contact)
-    #incomplete
     except ValueError:
         print("Error in the entry")
 
