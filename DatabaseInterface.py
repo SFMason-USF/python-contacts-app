@@ -1,6 +1,15 @@
 import sqlite3
 import os
 
+class UserAlreadyExistsException(Exception): 
+    pass
+
+class UserNotFoundException(Exception):
+    pass
+
+class DatabaseNotConnectedException(Exception):
+    pass
+
 class DatabaseInterface:
     '''Interface between the program functionality and the database storage of data.'''
     #Names of database columns
@@ -43,6 +52,8 @@ class DatabaseInterface:
 
     @property
     def Contacts(self):
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         return [self.__rowToContact(row) for row in self.__dbConnection.execute('select * from {}'.format(self.__currentUser)).fetchall()]
 
     def Connect(self):
@@ -52,30 +63,60 @@ class DatabaseInterface:
         self.__dbConnection.row_factory = sqlite3.Row
         self.__dbConnection.execute('''create table if not exists {} ({} text, {} text, {} int, {} text, {} text)'''
                                     .format(self.__currentUser, *DatabaseInterface.KEYS()))
+        self.__dbConnection.execute('''create table is not exists Users (username text PRIMARY KEY, password text)''')
+
+    def UserExists(self):
+        '''Returns true if the current user of this database interface exists, false otherwise'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
+        return 0 != len(conn.execute('''select * from Users''').fetchall())
+
+    def RegisterUser(self, username, password):
+        '''Register a new user to the users table. Raises a UserAlreadyExists exception if username already exists'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
+        if 0 != len(self.__dbConnection.execute('''select * from Users where username=?''', (username,)).fetchall()):
+            raise UserAlreadyExistsException()
+        self.__dbConnection.execute('''insert into Users (username, password) values (?, ?)''', (username, password))
+
+    def LoginExists(self, username, password):
+        '''Returns true if there exists user with username and their password is password'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
+        if not self.UserExists(username):
+            return False
+        return self.__dbConnection.execute('''select * from Users where username=? and password=?''', (username, password)).fetchall()[0]['password'] == password
 
     def Commit(self):
         '''Commit changes to the database.
         Not strictly necessary, as all changes will be committed
         when Closing Out, but this function is here if you need it.'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         if self.__dbConnection:
             self.__dbConnection.commit()
 
     def Close(self):
         '''Close the database connection without committing.
         Not for the faint of heart.'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         self.__dbConnection.close()
 
     def CloseOut(self):
         '''Commit changes and close the database connection'''
-        if self.__dbConnection:
-            self.Commit()
-            self.Close()
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
+        self.Commit()
+        self.Close()
 
     def AddContact(self, contact):
         '''Add contact into the current user's database'''
         #Check if it's already in
         #I would use unique and primary keys,
         #but we have to check against both first and last name
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         if self.__dbConnection.execute('''select exists(select 1 from {} where {}=? and {}=? limit 1)'''
                                           .format(self.__currentUser, 
                                                   DatabaseInterface.KEYS.FirstName, 
@@ -99,6 +140,8 @@ class DatabaseInterface:
         '''Returns a list of contacts that contain searchStr anywhere within any of their columns.
         e.g. Search(813) will return people with 813 phone numbers and people who live on 813 North St.
         Wildcards: % is 0 or more characters; _ is any single character. e.g. Search(8_3) returns numbers with 813 and 863.'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         searchStr = '%' + searchStr + '%'
         return [self.__rowToContact(row) 
                 for row in self.__dbConnection.execute('''select * from {} 
@@ -113,6 +156,8 @@ class DatabaseInterface:
 
     def DeleteContact(self, contact):
         '''Given a contact, deletes contacts with matching fields.'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         name = None
         try:
             name = contact.name.split()
@@ -131,6 +176,8 @@ class DatabaseInterface:
 
     def EditContact(self, contact, newContact):
         '''Given a contact, replaces the contact in the database with newContact'''
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
         name = None
         try:
             name = contact.name.split()
