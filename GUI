@@ -1,0 +1,114 @@
+import tkinter as tk
+
+
+class LoginP:
+    def __init__(self, master):
+        self.master = master
+        self.frame = tk.Frame(self.master)
+        self.insideFrame = tk.Frame(width=200, height=100)
+        master.geometry("950x550+500+150")
+        master.resizable(width=False, height=False)
+
+        self.LoginID = tk.Text(height=1, width=25).place(x=325, y=155)
+        self.IDlbl = tk.Label(text="Login ID").place(x=325, y=175)
+
+        self.LoginPASS = tk.Text(height=1, width=25).place(x=325, y=255)
+        self.PASSlbl = tk.Label(text="Password").place(x=325, y=275)
+
+        self.insideFrame.place(x=325, y=325)
+        self.button1 = tk.Button(self.insideFrame, text='login', width=28, command=self.load_window)
+        self.button1.pack()
+
+        self.button2 = tk.Button(self.insideFrame, text='New User Registration', width=28, command=self.new_window)
+        self.button2.pack()
+
+    def _close(self):
+        self.destroy()
+
+    def new_window(self):
+        self.newWindow = tk.Toplevel(self.master)
+        self.app = RegisterP(self.newWindow)
+
+    def load_window(self):
+
+        self.newWindow = self.master
+        self.app = MainP(self.newWindow)
+        self._close()
+
+
+class RegisterP:
+    def __init__(self, master):
+        self.master = master
+        self.frame = tk.Frame(self.master)
+        #self.insideFrame = tk.Frame(width=200, height=100)
+        master.geometry("950x550+500+150")
+        master.resizable(width=False, height=False)
+
+        self.Fname = tk.Text(height=1, width=25).place(x=325, y=155)
+        self.Fnamelbl = tk.Label(text="First Name").place(x=325, y=175)
+
+        self.Lname = tk.Text(height=1, width=25).place(x=425, y=155)
+        self.Lnamelbl = tk.Label(text="Last Name").place(x=375, y=175)
+
+        self.Phone = tk.Text(height=1, width=25).place(x=325, y=195)
+        self.Phonelbl = tk.Label(text="Phone Number").place(x=325, y=215)
+
+        self.Email = tk.Text(height=1, width=25).place(x=375, y=235)
+        self.Emaillbl = tk.Label(text="Email").place(x=375, y=255)
+
+        self.Street = tk.Text(height=1, width=25).place(x=325, y=275)
+        self.Streetlbl = tk.Label(text="Address").place(x=325, y=295)
+
+        self.City = tk.Text(height=1, width=25).place(x=325, y=315)
+        self.Citylbl = tk.Label(text="City").place(x=325, y=335)
+
+        self.State = tk.Text(height=1, width=25).place(x=325, y=355)
+        self.Statelbl = tk.Label(text="State").place(x=325, y=375)
+
+        self.Zip = tk.Text(height=1, width=25).place(x=325, y=395)
+        self.Ziplbl = tk.Label(text="Zip Code").place(x=325, y=415)
+
+    def close_windows(self):
+        self.master.destroy()
+
+class MainP:
+    def __init__(self, master):
+        self.master = master
+        self.frame = tk.Frame(self.master)
+        #self.insideFrame = tk.Frame(width=200, height=100)
+        master.geometry("950x550+500+150")
+        master.resizable(width=False, height=False)
+
+        self.Fname = tk.Text(height=1, width=25).place(x=325, y=155)
+        self.Fnamelbl = tk.Label(text="First Name").place(x=325, y=175)
+
+        self.Lname = tk.Text(height=1, width=25).place(x=375, y=155)
+        self.Lnamelbl = tk.Label(text="Last Name").place(x=375, y=175)
+
+        self.Phone = tk.Text(height=1, width=25).place(x=325, y=195)
+        self.Phonelbl = tk.Label(text="Phone Number").place(x=325, y=215)
+
+        self.Email = tk.Text(height=1, width=25).place(x=375, y=235)
+        self.Emaillbl = tk.Label(text="Email").place(x=375, y=255)
+
+        self.Street = tk.Text(height=1, width=25).place(x=325, y=275)
+        self.Streetlbl = tk.Label(text="Address").place(x=325, y=295)
+
+        self.City = tk.Text(height=1, width=25).place(x=325, y=315)
+        self.Citylbl = tk.Label(text="City").place(x=325, y=335)
+
+        self.State = tk.Text(height=1, width=25).place(x=325, y=355)
+        self.Statelbl = tk.Label(text="State").place(x=325, y=375)
+
+        self.Zip = tk.Text(height=1, width=25).place(x=325, y=395)
+        self.Ziplbl = tk.Label(text="Zip Code").place(x=325, y=415)
+
+
+
+def main():
+    root = tk.Tk()
+    app = LoginP(root)
+    root.mainloop()
+
+if __name__ == '__main__':
+    main()
