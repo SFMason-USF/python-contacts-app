@@ -77,13 +77,13 @@ class DatabaseInterface:
             raise DatabaseNotConnectedException()
         return 0 != len(self.__dbConnection.execute('''select * from Users where username=?''', (self.__currentUser,)).fetchall())
 
-    def RegisterUser(self, username, password):
+    def RegisterCurrentUser(self, password):
         '''Register a new user to the users table. Raises a UserAlreadyExists exception if username already exists'''
         if self.__dbConnection == None:
             raise DatabaseNotConnectedException()
-        if 0 != len(self.__dbConnection.execute('''select * from Users where username=?''', (username,)).fetchall()):
+        if 0 != len(self.__dbConnection.execute('''select * from Users where username=?''', (self.__currentUser,)).fetchall()):
             raise UserAlreadyExistsException()
-        self.__dbConnection.execute('''insert into Users (username, password) values (?, ?)''', (username, password))
+        self.__dbConnection.execute('''insert into Users (username, password) values (?, ?)''', (self.__currentUser, password))
 
     def CheckPassword(self, password):
         '''Returns true if the current user exists and his password is password'''
