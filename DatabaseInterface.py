@@ -56,6 +56,12 @@ class DatabaseInterface:
             raise DatabaseNotConnectedException()
         return [self.__rowToContact(row) for row in self.__dbConnection.execute('select * from {}'.format(self.__currentUser)).fetchall()]
 
+    @property
+    def Users(self):
+        if self.__dbConnection == None:
+            raise DatabaseNotConnectedException()
+        return [row['username'] for row in self.__dbConnection.execute('select username from Users').fetchall()]
+
     def Connect(self):
         '''Connect to the database for the current user'''
         self.__dbConnection = sqlite3.connect(os.path.join(os.getcwd(), 'contacts.db') 
@@ -63,13 +69,13 @@ class DatabaseInterface:
         self.__dbConnection.row_factory = sqlite3.Row
         self.__dbConnection.execute('''create table if not exists {} ({} text, {} text, {} int, {} text, {} text)'''
                                     .format(self.__currentUser, *DatabaseInterface.KEYS()))
-        self.__dbConnection.execute('''create table is not exists Users (username text PRIMARY KEY, password text)''')
+        self.__dbConnection.execute('''create table if not exists Users (username text PRIMARY KEY, password text)''')
 
     def UserExists(self):
         '''Returns true if the current user of this database interface exists, false otherwise'''
         if self.__dbConnection == None:
             raise DatabaseNotConnectedException()
-        return 0 != len(conn.execute('''select * from Users''').fetchall())
+        return 0 != len(self.__dbConnection.execute('''select * from Users where username=?''', (self.__currentUser,)).fetchall())
 
     def RegisterUser(self, username, password):
         '''Register a new user to the users table. Raises a UserAlreadyExists exception if username already exists'''
@@ -79,13 +85,16 @@ class DatabaseInterface:
             raise UserAlreadyExistsException()
         self.__dbConnection.execute('''insert into Users (username, password) values (?, ?)''', (username, password))
 
-    def LoginExists(self, username, password):
-        '''Returns true if there exists user with username and their password is password'''
+    def CheckPassword(self, password):
+        '''Returns true if the current user exists and his password is password'''
         if self.__dbConnection == None:
             raise DatabaseNotConnectedException()
-        if not self.UserExists(username):
+        if not self.UserExists():
             return False
-        return self.__dbConnection.execute('''select * from Users where username=? and password=?''', (username, password)).fetchall()[0]['password'] == password
+        try:
+            return self.__dbConnection.execute('''select * from Users where username=? and password=?''', (self.__currentUser, password)).fetchall()[0]['password'] == password
+        except IndexError:
+            return False
 
     def Commit(self):
         '''Commit changes to the database.
@@ -208,8 +217,20 @@ class DatabaseInterface:
 if __name__ == '__main__':
     #Example 1: With with statement
     username = 'mason11'
-    username = ':memory:' #set to :memory: to debug.  Makes temp database residing in memory
     with DatabaseInterface(username) as db:
+        print('Logging in')
+        exists = db.UserExists()
+        print(exists)
+        if not exists:
+            db.RegisterUser('mason11', 'pw')
+        exists = db.UserExists()
+        print(exists)
+        print('Attempting login')
+        login = db.CheckPassword('pw')
+        print(login)
+        login = db.CheckPassword(' pw')
+        print(login)
+
         print('Adding contacts')
         db.AddContact(Contact('Spenser', 'Mason', 8139570260, 'mason11@mail.usf.edu', '111 W North St'))
         db.AddContact(Contact('Christian', 'Morales', 8637014768, None, None))
@@ -228,6 +249,7 @@ if __name__ == '__main__':
         for contact in db.Contacts:
             print(contact)
         print()
+        input('Press enter to continue...')
 
     #Example 2: The dirty way
     #db = DatabaseInterface(username)
